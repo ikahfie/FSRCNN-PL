@@ -7,10 +7,11 @@ Implemented using Tensorflow 2.6. Trained using 200 images from DIV2K_TRAIN_HR d
 
 ## Training Guide
 ---
-1. Open ```run_train.py```
-2. Edit ```config``` dictionary variables.
-3. Edit ```image_config.py``` inside ```utils/```
-4. Run ```python run_train.py```
+1. Download a pretrained VGG16 hdf5 model and put it either in ./ or utils/
+2. Open ```run_train.py```
+3. Edit ```config``` dictionary variables.
+4. Edit variables inside of ```image_config.py```
+5. Run ```python run_train.py```
 
 ## Dependacies
 ---

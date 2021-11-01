@@ -12,11 +12,12 @@ from tensorflow.python.ops.image_ops import ssim, psnr
 from tensorflow.keras.applications.vgg16 import preprocess_input
 
 try:
-    from utils.image_config import HR_IMG_SIZE
     from utils.model import vgg_loss
 except ModuleNotFoundError:
-    from image_config import HR_IMG_SIZE
     from model import vgg_loss
+
+from image_config import HR_IMG_SIZE
+
 
 def metric_ssim(y_true, y_pred, *kwargs):
     return ssim(y_true, y_pred, max_val=1.0)

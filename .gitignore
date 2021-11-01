@@ -1,3 +1,6 @@
 *.pyc
 .vs
 .vscode
+dataset
+weights
+test_pretrained_model.ipynb

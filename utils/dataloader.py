@@ -5,10 +5,7 @@ import random
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from tensorflow import cast, float16, float32
 from tensorflow.keras.utils import Sequence
-try:
-    from utils.constants import *
-except:
-    from constants import *
+from image_config import *
 from tensorflow.compat.v1.logging import set_verbosity, ERROR
 set_verbosity(ERROR)
 

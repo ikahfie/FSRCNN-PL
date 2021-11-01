@@ -1,13 +1,21 @@
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
 try:
     from utils.dataloader import DIV2K
-    from utils.lossAndMetrics import perceptual_loss, metric_psnr, metric_ssim
-    from utils.model import create_model
 except ModuleNotFoundError:
     from dataloader import DIV2K
-    from lossAndMetrics import perceptual_loss, metric_psnr, metric_ssim
+
+try:
+    from utils.lossAndMetrics import perceptual_loss, metric_psnr, metric_ssim
+except ModuleNotFoundError:
     from model import create_model
+    
+try:
+    from utils.model import create_model
+except ModuleNotFoundError:
+    from model import create_model
+
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.callbacks import (
     ReduceLROnPlateau,
@@ -98,15 +106,14 @@ def train(config: dict) -> None:
 if __name__ == "__main__":
     train_config = {
         "dataset_dir": "dataset\DIV2K_train_HR",
-        "k": 2,
         "d": 32,
         "s": 5,
         "m": 1,
         "lr": 0.001,
         "epoch": 500,
-        "batch_size": 8,
+        "batch_size": 32,
         "steps_per_epoch": 4,
-        "val_batch_size": 8,
+        "val_batch_size": 32,
         "val_steps": 10,
         "weight_path": "weights/model_{epoch:05d}.h5",
         "alpha_loss": 0.01,
