@@ -15,7 +15,8 @@ training_config = {
     "val_batch_size": 32,
     "val_steps": 10,
     "weight_path": "weights/model_{epoch:05d}.h5",
-    "alpha_loss": 0.01
+    "alpha": 0.01, # loss mulltiplier
+    "vgg_layer_nums": [2, 5, 9]
     }
 if __name__=="__main__":
     train(training_config)

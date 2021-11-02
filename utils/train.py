@@ -58,7 +58,9 @@ def train(config: dict) -> None:
     lr = config["lr"]
     model.compile(
         optimizer=RMSprop(learning_rate= lr),
-        loss=perceptual_loss(alpha=config["alpha"]),
+        loss=perceptual_loss(
+            alpha=config["alpha"],
+            vgg_layer_nums=config["vgg_layer_nums"]),
         metrics=[metric_psnr,metric_ssim]
     )
 
@@ -116,8 +118,9 @@ if __name__ == "__main__":
         "val_batch_size": 32,
         "val_steps": 10,
         "weight_path": "weights/model_{epoch:05d}.h5",
-        "alpha_loss": 0.01,
-        "vgg_block_nums": [2, 5, 9]
+        "alpha": 0.01,
+        "vgg_layer_nums": [2, 5, 9]
     }
 
     train(train_config)
+x

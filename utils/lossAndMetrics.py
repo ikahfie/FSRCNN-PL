@@ -53,5 +53,4 @@ def perceptual_loss(alpha:float, vgg_layer_nums:list, *kwargs):
                 ))  
 
         return alpha * reduce_sum(loss) + reduce_mean(mae(y_true, y_pred))
-
     return loss
