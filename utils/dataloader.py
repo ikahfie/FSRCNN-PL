@@ -23,12 +23,12 @@ class DIV2K(Sequence):
         ])
 
         if set_type == "TRAIN":
-            self.image_fns = self.image_fns[:200]
+            self.image_fns = self.image_fns[:500]
         elif set_type == "VAL":
             self.image_fns = self.image_fns[-200:-100]
         elif set_type == "ALL":
             self.image_fns = np.concatenate(
-                (self.image_fns[:200],
+                (self.image_fns[:500],
                 self.image_fns[-200:100]),
                 axis=0)
         else:
