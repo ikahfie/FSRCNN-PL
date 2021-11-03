@@ -3,4 +3,6 @@
 .vscode
 dataset
 weights
+.idea
+WIP
 test_pretrained_model.ipynb
