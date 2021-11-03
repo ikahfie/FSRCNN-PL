@@ -18,7 +18,7 @@ training_config = {
     "weight_path": "weights/model_{epoch:05d}.h5",
     "alpha": 1.0,  # loss mulltiplier
     "vgg_layer_nums": [2, 5, 9],
-    "tiled": "",
+    "tiled": False,
     "model": "fsrcnn",  # "fsrcnn" or "fsrcnn_tiled"
     "pretrainedWeightPath": ""
 }
