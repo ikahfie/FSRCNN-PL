@@ -43,7 +43,8 @@ class DIV2K(Sequence):
                         saturation=0.1,
                         hue=0.1,
                         p=0.8
-                    )]
+                    )
+                ]
             )
         else:
             self.transform = al.Compose(

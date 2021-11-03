@@ -26,6 +26,17 @@ def fsrcnn(
         tiled: bool,
         upscaling_factor: int = UPSCALING_FACTOR,
         color_channels: int = COLOR_CHANNELS):
+    """
+    Generate and build the FSRCNN model.
+
+    :param d: fsrcnn d parameter.
+    :param s: fsrcnn s parameter
+    :param m: fsrcnn m parameter
+    :param tiled: tiled input or not? in bool.
+    :param upscaling_factor: final upscaling factor
+    :param color_channels: ndim image channels.
+    :returns a fsrcnn model.
+    """
     if tiled:
         input_size = LR_TILE_SIZE
     else:
@@ -98,6 +109,12 @@ def vgg_block(inputs, f: int, d: int, m: int, block_name: str):
 
 
 def vgg_loss(block_nums: list, tiled: bool):
+    """
+
+    :param block_nums: tuple of indexes choosen VGG Layer
+    :param tiled: bool type of if input tiled or not.
+    :return: tuples of keras loss network models
+    """
     if not tiled:
         img_input = Input(shape=(HR_TILE_SIZE[0], HR_TILE_SIZE[1], 3))
     else:

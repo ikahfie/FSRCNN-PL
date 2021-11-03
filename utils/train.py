@@ -25,6 +25,13 @@ from tensorflow.keras.callbacks import (
 
 
 def train(config: dict) -> None:
+    """
+    Main train pipeline function. generate input, training model,
+    based on the config dict params.
+
+    :param config: main config file
+    :return: None
+    """
     print(
         " ####################################################################\n",
         "*----------------------------   CONFIG   --------------------------*\n",
