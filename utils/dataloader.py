@@ -1,12 +1,14 @@
 import os
-import albumentations as A
+
+import albumentations as al
 import numpy as np
-import random
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-from tensorflow import cast, float16, float32
+from tensorflow import cast, float32
 from tensorflow.keras.utils import Sequence
-from image_config import *
 from tensorflow.compat.v1.logging import set_verbosity, ERROR
+from image_config import *
+
 set_verbosity(ERROR)
 
 
@@ -14,7 +16,13 @@ class DIV2K(Sequence):
     def __init__(self,
                  hr_image_folder: str,
                  batch_size: int,
-                 set_type: str) -> None:
+                 set_type: str,
+                 tiled: bool) -> None:
+
+        self.tiled = tiled
+        if self.tiled:
+            self.LR_IMG_SIZE = LR_TILE_SIZE
+            self.HR_IMG_SIZE = HR_TILE_SIZE
 
         self.batch_size = batch_size
         self.hr_image_folder = hr_image_folder
@@ -22,65 +30,51 @@ class DIV2K(Sequence):
             x for x in os.listdir(self.hr_image_folder) if x.endswith(IMAGE_FORMAT)
         ])
 
-        if set_type == "TRAIN":
-            self.image_fns = self.image_fns[:600]
-        elif set_type == "VAL":
-            self.image_fns = self.image_fns[-200:-100]
-        elif set_type == "ALL":
-            self.image_fns = np.concatenate(
-                (self.image_fns[:600],
-                self.image_fns[-200:100]),
-                axis=0)
-        else:
-            self.image_fns = self.image_fns[-100]
-
         if set_type in ["train", "val"]:
-            self.transform = A.Compose(
-                [
-                    A.RandomCrop(
-                        width=HR_IMG_SIZE[0], 
-                        height=HR_IMG_SIZE[1], 
-                        p=1.0),
-                    A.HorizontalFlip(p=0.5),
-                    A.ColorJitter(
-                        brightness=0.1, 
-                        contrast=0.1, 
-                        saturation=0.1, 
-                        hue=0.1, 
+            self.transform = al.Compose(
+                [al.RandomCrop(
+                    width=self.HR_IMG_SIZE[0],
+                    height=self.HR_IMG_SIZE[1],
+                    p=1.0),
+                    al.HorizontalFlip(p=0.5),
+                    al.ColorJitter(
+                        brightness=0.1,
+                        contrast=0.1,
+                        saturation=0.1,
+                        hue=0.1,
                         p=0.8
-                    ),
-                ]
+                    )]
             )
         else:
-            self.transform = A.Compose(
+            self.transform = al.Compose(
                 [
-                    A.RandomCrop(
-                        width=HR_IMG_SIZE[0], 
-                        height=HR_IMG_SIZE[1], 
+                    al.RandomCrop(
+                        width=self.HR_IMG_SIZE[0],
+                        height=self.HR_IMG_SIZE[1],
                         p=1.0),
                 ]
             )
 
-        self.to_float = A.ToFloat(max_value=255)
+        self.to_float = al.ToFloat(max_value=255)
 
     def __len__(self):
         return len(self.image_fns) // self.batch_size
 
     def on_epoch_end(self):
-        random.shuffle(self.image_fns)
+        np.random.shuffle(self.image_fns)
 
     def __getitem__(self, idx):
         i = idx * self.batch_size
         batch_image_fns = self.image_fns[i:i + self.batch_size]
-        batch_HR_images = np.zeros(shape=(
-            self.batch_size, 
-            HR_IMG_SIZE[0], 
-            HR_IMG_SIZE[1], 
+        batch_hr_images = np.zeros(shape=(
+            self.batch_size,
+            self.HR_IMG_SIZE[0],
+            self.HR_IMG_SIZE[1],
             COLOR_CHANNELS))
-        batch_LR_images = np.zeros(shape=(
-            self.batch_size, 
-            LR_IMG_SIZE[0], 
-            LR_IMG_SIZE[1], 
+        batch_lr_images = np.zeros(shape=(
+            self.batch_size,
+            self.LR_IMG_SIZE[0],
+            self.LR_IMG_SIZE[1],
             COLOR_CHANNELS))
 
         for i, image_fn in enumerate(batch_image_fns):
@@ -97,14 +91,14 @@ class DIV2K(Sequence):
             )
             lr_image_transform = np.array(lr_image_transform_pil)
 
-            # batch_HR_images[i] = self.to_float(image=hr_image_transform)["image"]
-            # batch_LR_images[i] = self.to_float(image=lr_image_transform)["image"]
+            # batch_hr_images[i] = self.to_float(image=hr_image_transform)["image"]
+            # batch_lr_images[i] = self.to_float(image=lr_image_transform)["image"]
 
-            batch_HR_images[i] = cast(
-                hr_image_transform/255.,
+            batch_hr_images[i] = cast(
+                hr_image_transform / 255.,
                 dtype=float32)
-            batch_LR_images[i] = cast(
-                lr_image_transform/255.,
+            batch_lr_images[i] = cast(
+                lr_image_transform / 255.,
                 dtype=float32)
 
-            return (batch_LR_images, batch_HR_images)
+        return batch_lr_images, batch_hr_images
