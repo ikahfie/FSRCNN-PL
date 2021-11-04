@@ -49,7 +49,7 @@ def train(config: dict) -> None:
     train_dataset = DIV2K(
         hr_image_folder=config["train_dir"],
         batch_size=config["batch_size"],
-        set_type="",
+        set_type="TRAIN",
         tiled=config["tiled"]
     )
 
