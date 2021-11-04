@@ -11,7 +11,17 @@ from tensorflow.compat.v1.logging import set_verbosity, ERROR
 
 import sys
 sys.path.append(r"../")
-from image_config import *
+from image_config import (
+    HR_IMG_SIZE,
+    LR_IMG_SIZE,
+    PADDING,
+    INIT_TILE_SIZE,
+    LR_TILE_SIZE,
+    HR_TILE_SIZE,
+    UPSCALING_FACTOR,
+    DOWNSAMPLE_MODE
+)
+
 
 set_verbosity(ERROR)
 
