@@ -32,7 +32,6 @@ class DIV2K(Sequence):
                  batch_size: int,
                  set_type: str,
                  tiled: bool) -> None:
-        print(HR_TILE_SIZE)
         self.tiled = tiled
         if self.tiled:
             self.LR_IMG_SIZE = LR_TILE_SIZE
