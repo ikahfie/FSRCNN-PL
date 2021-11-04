@@ -9,27 +9,16 @@ from tensorflow.keras.layers import (
 
 from tensorflow.keras.initializers import HeNormal, RandomNormal
 
-try:
-    from image_config import (
-        HR_IMG_SIZE,
-        LR_IMG_SIZE,
-        HR_TILE_SIZE,
-        LR_TILE_SIZE,
-        UPSCALING_FACTOR,
-        COLOR_CHANNELS
-    )
-except ModuleNotFoundError:
-    #from . import image_config
-    import sys
-    sys.path.append(r"../")
-    from image_config import (
-        HR_IMG_SIZE,
-        LR_IMG_SIZE,
-        HR_TILE_SIZE,
-        LR_TILE_SIZE,
-        UPSCALING_FACTOR,
-        COLOR_CHANNELS
-    )
+import sys
+sys.path.append(r"../")
+from image_config import (
+    HR_IMG_SIZE,
+    LR_IMG_SIZE,
+    HR_TILE_SIZE,
+    LR_TILE_SIZE,
+    UPSCALING_FACTOR,
+    COLOR_CHANNELS
+)
 
 
 def fsrcnn(

@@ -1,6 +1,3 @@
-from image_config import HR_TILE_SIZE
-
-
 try:
     from utils.train import train
 except ModuleNotFoundError:
@@ -25,4 +22,5 @@ training_config = {
     "model": "fsrcnn",  # "fsrcnn" or "fsrcnn_tiled"
     "pretrainedWeightPath": ""
 }
-
+if __name__ == "__main__":
+    train(training_config)
