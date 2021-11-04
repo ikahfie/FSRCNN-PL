@@ -1,22 +1,11 @@
 import os
-
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-try:
-    from utils.dataloader import DIV2K
-except ModuleNotFoundError:
-    from dataloader import DIV2K
+from utils.dataloader import DIV2K
+from utils.lossAndMetrics import perceptual_loss, PSNR, SSIM
+from utils.model import fsrcnn
 
-try:
-    from utils.lossAndMetrics import perceptual_loss, metric_psnr, metric_ssim
-except ModuleNotFoundError:
-    from lossAndMetrics import perceptual_loss, metric_psnr, metric_ssim
-
-try:
-    from utils.model import fsrcnn
-except ModuleNotFoundError:
-    from model import fsrcnn
-
+import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.callbacks import (
     ReduceLROnPlateau,
@@ -72,21 +61,18 @@ def train(config: dict) -> None:
 
     lr = config["lr"]
 
-    model.add_loss(
-        perceptual_loss(
-            alpha=config["alpha"],
-            vgg_layer_nums=config["vgg_layer_nums"],
-            tiled=config["tiled"]
-        )
-    )
-
-    model.add_metrics(
-        ["accuracy", metric_psnr, metric_ssim]
-    )
 
     model.compile(
         optimizer=RMSprop(learning_rate=lr),
+        loss = perceptual_loss(
+            alpha=config["alpha"],
+            vgg_layer_nums=config["vgg_layer_nums"],
+            tiled=config["tiled"]
+        ),
+        metrics=([SSIM, PSNR])
     )
+
+    model.summary()
 
     reduce_lr = ReduceLROnPlateau(
         monitor="loss",
@@ -137,15 +123,15 @@ if __name__ == "__main__":
         "d": 32,
         "s": 5,
         "m": 1,
-        "lr": 0.001,
+        "lr": 0.004,
         "epoch": 500,
-        "batch_size": 32,
+        "batch_size": 8,
         "steps_per_epoch": 4,
-        "val_batch_size": 32,
+        "val_batch_size": 8,
         "val_steps": 10,
-        "weight_path": "weights/model_{epoch:05d}.h5",
-        "alpha": 0.01,  # loss mulltiplier
-        "vgg_layer_nums": [2, 5, 9],
+        "output_weight_path": "weights/model_{epoch:05d}.h5",
+        "alpha": 1,  # loss mulltiplier 0-1.0
+        "vgg_layer_nums": [2, 5],
         "tiled": False,  # True of False
         "model": "fsrcnn",  # "fsrcnn" or "fsrcnn_tiled"
         "pretrainedWeightPath": ""

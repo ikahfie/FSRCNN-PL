@@ -1,7 +1,4 @@
-try:
-    from utils.train import train
-except ModuleNotFoundError:
-    from train import train
+from utils import train
 
 training_config = {
     "train_dir": "dataset/DIV2K_train_HR",
@@ -15,12 +12,12 @@ training_config = {
     "steps_per_epoch": 4,
     "val_batch_size": 32,
     "val_steps": 10,
-    "weight_path": "weights/model_{epoch:05d}.h5",
+    "output_weight_path": "weights/model_{epoch:05d}.h5",
     "alpha": 1.0,  # loss mulltiplier
     "vgg_layer_nums": [2, 5, 9],
-    "tiled": False,
-    "model": "fsrcnn",  # "fsrcnn" or "fsrcnn_tiled"
+    "tiled": True,
+    "model": "fsrcnn_tiled",  # "fsrcnn" or "fsrcnn_tiled"
     "pretrainedWeightPath": ""
 }
 if __name__ == "__main__":
-    train(training_config)
+    train.train(training_config)

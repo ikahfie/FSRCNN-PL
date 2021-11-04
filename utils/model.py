@@ -1,3 +1,7 @@
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+from tensorflow.compat.v1.logging import set_verbosity, ERROR
 from tensorflow.keras import Sequential, Model
 from tensorflow.keras.layers import (
     Conv2D,
@@ -8,10 +12,15 @@ from tensorflow.keras.layers import (
     MaxPooling2D)
 
 from tensorflow.keras.initializers import HeNormal, RandomNormal
-
-import sys
-sys.path.append(r"../")
-from image_config import *
+from tensorflow.keras.applications import VGG16
+from image_config import (
+    HR_IMG_SIZE,
+    LR_IMG_SIZE,
+    INIT_TILE_SIZE,
+    PADDING,
+    UPSCALING_FACTOR,
+    COLOR_CHANNELS
+)
 
 
 def fsrcnn(
@@ -32,10 +41,22 @@ def fsrcnn(
     :param color_channels: ndim image channels.
     :returns a fsrcnn model.
     """
+
+    set_verbosity(ERROR)
+
+    LR_TILE_SIZE = (
+        PADDING + INIT_TILE_SIZE[0],
+        PADDING + INIT_TILE_SIZE[1])
+
+    HR_TILE_SIZE = (
+        (PADDING + LR_TILE_SIZE[0]) * UPSCALING_FACTOR, 
+        (PADDING + LR_TILE_SIZE[1]) * UPSCALING_FACTOR)
+
     if tiled:
         input_size = LR_TILE_SIZE
     else:
         input_size = LR_IMG_SIZE
+
     model = Sequential()
     model.add(InputLayer(input_shape=(input_size[0],
                                       input_size[1],
@@ -84,6 +105,8 @@ def fsrcnn(
 
 
 def vgg_block(inputs, f: int, d: int, m: int, block_name: str):
+    set_verbosity(ERROR)
+
     x = inputs
 
     for repetition in range(m):
@@ -110,34 +133,31 @@ def vgg_loss(block_nums: list, tiled: bool):
     :param tiled: bool type of if input tiled or not.
     :return: tuples of keras loss network models
     """
-    if not tiled:
-        img_input = Input(shape=(HR_TILE_SIZE[0], HR_TILE_SIZE[1], 3))
+    set_verbosity(ERROR)
+
+    LR_TILE_SIZE = (
+        PADDING + INIT_TILE_SIZE[0],
+        PADDING + INIT_TILE_SIZE[1])
+
+    HR_TILE_SIZE = (
+        (PADDING + LR_TILE_SIZE[0]) * UPSCALING_FACTOR, 
+        (PADDING + LR_TILE_SIZE[1]) * UPSCALING_FACTOR)
+
+    if tiled:
+        img_shape=(HR_TILE_SIZE[0], HR_TILE_SIZE[1], 3)
     else:
-        img_input = Input(shape=(HR_IMG_SIZE[0], HR_IMG_SIZE[1], 3))
+        img_shape=(HR_IMG_SIZE[0], HR_IMG_SIZE[1], 3)
 
-    filters = [64, 128, 256, 512, 512]
-    reps = [2, 2, 3, 3, 3]
+    weights = "utils/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
 
-    x = img_input
-    for n in range(len(filters)):
-        x = vgg_block(
-            x, filters[n], 3, reps[n], "block"+str(n+1)
-        )
-
-    __vgg = Model(inputs=img_input, outputs=x)
-    try:
-        __vgg.load_weights(
-            "utils/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
-        )
-    except OSError:
-        __vgg.load_weights(
-            "vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5"
-        )
-
+    __vgg= VGG16(
+        include_top=False, 
+        weights=weights,
+        input_shape=img_shape
+    )
     __vgg.trainable = False
-    # return __vgg
-
     loss_models = []
+
     for layer in block_nums:
         loss_models.append(
             Model(

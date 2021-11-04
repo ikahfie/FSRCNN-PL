@@ -8,20 +8,7 @@ from tensorflow import cast, float32
 from tensorflow.keras.utils import Sequence
 from tensorflow.compat.v1.logging import set_verbosity, ERROR
 
-
-import sys
-sys.path.append(r"../")
-from image_config import (
-    HR_IMG_SIZE,
-    LR_IMG_SIZE,
-    PADDING,
-    INIT_TILE_SIZE,
-    LR_TILE_SIZE,
-    HR_TILE_SIZE,
-    UPSCALING_FACTOR,
-    DOWNSAMPLE_MODE
-)
-
+from image_config import *
 
 set_verbosity(ERROR)
 
@@ -32,14 +19,24 @@ class DIV2K(Sequence):
                  batch_size: int,
                  set_type: str,
                  tiled: bool) -> None:
+
         self.tiled = tiled
+
+        LR_TILE_SIZE = (
+            PADDING + INIT_TILE_SIZE[0],
+            PADDING + INIT_TILE_SIZE[1])
+        HR_TILE_SIZE = (
+            (PADDING + LR_TILE_SIZE[0]) * UPSCALING_FACTOR, 
+            (PADDING + LR_TILE_SIZE[1]) * UPSCALING_FACTOR)
+
         if self.tiled:
             self.LR_IMG_SIZE = LR_TILE_SIZE
             self.HR_IMG_SIZE = HR_TILE_SIZE
         else:
             self.LR_IMG_SIZE = LR_IMG_SIZE
             self.HR_IMG_SIZE = HR_IMG_SIZE
-            
+
+        print(self.LR_IMG_SIZE, self.HR_IMG_SIZE)
         self.batch_size = batch_size
         self.hr_image_folder = hr_image_folder
         self.image_fns = np.sort([
@@ -48,8 +45,7 @@ class DIV2K(Sequence):
 
         if set_type in ["train", "val"]:
             self.transform = al.Compose(
-                [
-                    al.RandomCrop(
+                [al.RandomCrop(
                     width=self.HR_IMG_SIZE[0],
                     height=self.HR_IMG_SIZE[1],
                     p=1.0),
@@ -105,7 +101,7 @@ class DIV2K(Sequence):
             hr_image_transform = self.transform(image=hr_image)["image"]
             hr_image_transform_pil = Image.fromarray(hr_image_transform)
             lr_image_transform_pil = hr_image_transform_pil.resize(
-                LR_IMG_SIZE, resample=DOWNSAMPLE_MODE
+                self.LR_IMG_SIZE, resample=DOWNSAMPLE_MODE
             )
             lr_image_transform = np.array(lr_image_transform_pil)
 
