@@ -112,7 +112,7 @@ def train(config: dict) -> None:
         callbacks=[reduce_lr, early_stop, ckpt],
         validation_data=val_dataset,
         # validation_steps=config["val_steps"],
-        verbose=0
+        verbose=1
     )
 
 
