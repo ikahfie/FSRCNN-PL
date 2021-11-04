@@ -3,7 +3,7 @@ FSRCNN with VGG16 Perceptual Loss.
 ---
 Faster Super Resolution CNN  (Dong, *et al*., 2016) modified to
 use VGG16 perceptual loss.
-Implemented using Tensorflow 2.6. Trained using 200 images from DIV2K_TRAIN_HR dataset
+Implemented using Tensorflow 2.6. Trained using images from DIV2K_TRAIN_HR dataset
 
 ## Training Guide
 ---

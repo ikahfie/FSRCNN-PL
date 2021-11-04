@@ -1,8 +1,9 @@
 *.pyc
 .vs
 .vscode
+.idea
+output
 dataset
 weights
-.idea
 WIP
 test_pretrained_model.ipynb
