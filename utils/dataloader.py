@@ -7,7 +7,13 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from tensorflow import cast, float32
 from tensorflow.keras.utils import Sequence
 from tensorflow.compat.v1.logging import set_verbosity, ERROR
-from image_config import *
+
+try:
+    from image_config import *
+except ModuleNotFoundError:
+    import sys
+    sys.path.append(r"../")
+    from image_config import *
 
 set_verbosity(ERROR)
 
