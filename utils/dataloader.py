@@ -27,7 +27,10 @@ class DIV2K(Sequence):
         if self.tiled:
             self.LR_IMG_SIZE = LR_TILE_SIZE
             self.HR_IMG_SIZE = HR_TILE_SIZE
-
+        else:
+            self.LR_IMG_SIZE = LR_IMG_SIZE
+            self.HR_IMG_SIZE = HR_IMG_SIZE
+            
         self.batch_size = batch_size
         self.hr_image_folder = hr_image_folder
         self.image_fns = np.sort([
@@ -36,7 +39,8 @@ class DIV2K(Sequence):
 
         if set_type in ["train", "val"]:
             self.transform = al.Compose(
-                [al.RandomCrop(
+                [
+                    al.RandomCrop(
                     width=self.HR_IMG_SIZE[0],
                     height=self.HR_IMG_SIZE[1],
                     p=1.0),
